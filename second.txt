@@ -84,40 +84,68 @@ def nearest_neighbor(cities):
 
 pract 8 : 
 
-def greedy_coloring(graph):
+def is_safe(graph, color, vertex, c):
     """
-    Perform greedy graph coloring.
-    graph is represented as an adjacency list, where graph[i] is a list of neighbors of vertex i.
+    Check if it's safe to color the vertex with color 'c'.
+    The function checks if any adjacent vertex has the same color.
     """
-    n = len(graph)  # Number of vertices
-    colors = [-1] * n  # -1 means no color assigned
-    
-    # Assign the first color to the first vertex
-    colors[0] = 0
-    
-    # Assign colors to the rest of the vertices
-    for u in range(1, n):
-        # Create a boolean array to check which colors are used by adjacent vertices
-        available = [True] * n  # Initially, all colors are available
-        
-        # Check the colors of the neighbors of vertex u
-        for neighbor in graph[u]:
-            if colors[neighbor] != -1:
-                available[colors[neighbor]] = False
-        
-        # Find the first available color
-        for color in range(n):
-            if available[color]:
-                colors[u] = color
-                break
-    
-    return colors
-    
-    usage : 
+    for neighbor in graph[vertex]:
+        if color[neighbor] == c:
+            return False
+    return True
 
-    graph = {0: [1, 2], 1: [0, 3], 2: [0, 3], 3: [1, 2]}
-    colors = greedy_coloring(graph)
-    print(colors)  # Output: [0, 1, 2, 1]
+def graph_coloring_util(graph, m, color, vertex):
+    """
+    Utility function to try and color the graph starting from vertex 'vertex'.
+    It uses backtracking to check all possible colorings.
+    """
+    # If all vertices are assigned a color then return True
+    if vertex == len(graph):
+        return True
+    
+    # Try different colors for vertex 'vertex'
+    for c in range(1, m + 1):
+        if is_safe(graph, color, vertex, c):
+            color[vertex] = c  # Assign color 'c' to vertex 'vertex'
+            
+            # Recur to assign colors to the next vertices
+            if graph_coloring_util(graph, m, color, vertex + 1):
+                return True
+            
+            # Backtrack: If assigning color 'c' doesn't lead to a solution, remove it
+            color[vertex] = 0
+    
+    return False
+
+def graph_coloring(graph, m):
+    """
+    Main function to solve the m-coloring problem.
+    It returns True if the graph can be colored with m colors, otherwise False.
+    """
+    color = [0] * len(graph)  # Initialize all vertices as uncolored
+    
+    if graph_coloring_util(graph, m, color, 0):
+        print("Solution exists: The coloring is", color)
+        return True
+    else:
+        print("Solution does not exist")
+        return False
+
+# Example Graph (Adjacency List)
+# Graph: 
+# (0)--(1)
+#  |    |
+# (2)--(3)
+
+graph = {
+    0: [1, 2],
+    1: [0, 3],
+    2: [0, 3],
+    3: [1, 2]
+}
+
+m = 3  # Number of colors
+graph_coloring(graph, m)
 
 pract 9 :
 

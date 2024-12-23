@@ -1,0 +1,230 @@
+sorts : 
+
+#include <bits/stdc++.h>
+
+class sorts {
+  private:
+    void swap(std::vector<int>& arr, int i, int j) {
+      int temp = arr[i];
+      arr[i] = arr[j];
+      arr[j] = temp;
+    }
+
+  public:
+    void selectionSort(std::vector<int>& arr) {
+      for(int i = 0; i <= arr.size()-2; ++i) {
+        int min = i;
+        for(int j = i; j <= arr.size()-1; ++j) {
+          if(arr[j] < arr[min]) {
+            min = j;
+          }
+        }
+        swap(arr, i, min);
+      }
+    }
+
+    void insertionSort(std::vector<int>& arr) {
+      for(int i = 1; i < arr.size(); ++i) {
+        for(int j = i; j >= 0; --j) {
+          if(arr[j] < arr[j-1]) {
+            swap(arr, j, j-1);
+          }
+        }
+      }
+    }
+
+    void quickSort(std::vector<int>& arr, int low, int high) {
+      if(low < high) {
+        int pIndex = findIndex(arr, low, high);
+        quickSort(arr, low, pIndex-1);
+        quickSort(arr, pIndex+1, high);
+      }
+    }
+
+    int findIndex(std::vector<int>& arr, int low, int high) {
+      int i = low;
+      int j = high;
+      int pivot = low;
+
+      while(i < j) {
+        while(arr[i] <= arr[pivot] && i <= high) {
+          i++;
+        }
+        while(arr[j] > arr[pivot] && j >= low) {
+          j--;
+        }
+        if(i < j) {
+          swap(arr, i, j);
+        }
+      }
+      swap(arr, pivot, j);
+      return j;
+    }
+
+    void merge(std::vector<int>& arr, int left, int mid, int right) {
+      std::vector<int> temp;
+      int i = left, j = mid + 1;
+
+      while (i <= mid && j <= right) {
+        if (arr[i] <= arr[j])
+          temp.push_back(arr[i++]);
+        else
+          temp.push_back(arr[j++]);
+      }
+
+      while (i <= mid)
+        temp.push_back(arr[i++]);
+
+      while (j <= right)
+        temp.push_back(arr[j++]);
+
+      for (int k = 0; k < temp.size(); ++k)
+        arr[left + k] = temp[k];
+    }
+
+    void mergeSort(std::vector<int>& arr, int left, int right) {
+      if (left < right) {
+        int mid = left + (right - left) / 2;
+
+        mergeSort(arr, left, mid);
+        mergeSort(arr, mid + 1, right);
+
+        merge(arr, left, mid, right);
+      }
+    }
+
+    void printArray(std::vector<int>& arr, std::string str) {
+      std::cout << str << std::endl;
+      for(int i = 0; i < arr.size(); ++i)
+        std::cout << arr[i] << " ";
+      std::cout << std::endl;
+    }
+};
+
+int main() {
+  std::vector<int> arr = {4, 2, 1, 5, 3, 6};
+
+  sorts a;
+  a.mergeSort(arr, 0, 5);
+  a.printArray(arr, "After selection sort: ");
+
+  return 0;
+}
+
+Kruskal :
+
+class DisjointSetUnion:
+  def __init__(self, n):
+    self.parent = list(range(n))
+    self.rank = [0] * n
+
+    def find(self, x):
+      if self.parent[x] != x:
+      self.parent[x] = self.find(self.parent[x])  # Path compression
+      return self.parent[x]
+
+      def unite(self, x, y):
+  rootX = self.find(x)
+  rootY = self.find(y)
+  if rootX != rootY:
+  if self.rank[rootX] > self.rank[rootY]:
+  self.parent[rootY] = rootX
+  elif self.rank[rootX] < self.rank[rootY]:
+  self.parent[rootX] = rootY
+  else:
+  self.parent[rootY] = rootX
+  self.rank[rootX] += 1
+
+  def kruskal(n, edges):
+# Sort edges by weight
+    edges.sort(key=lambda x: x[2])
+
+dsu = DisjointSetUnion(n)
+  mst = []
+  total_weight = 0
+
+  for u, v, weight in edges:
+  if dsu.find(u) != dsu.find(v):
+  dsu.unite(u, v)
+  mst.append((u, v, weight))
+  total_weight += weight
+
+  print("Edges in the MST:")
+  for u, v, weight in mst:
+  print(f"{u} -- {v} == {weight}")
+  print("Total Weight of MST:", total_weight)
+
+# Example Usage
+  n = 4  # Number of vertices
+  edges = [
+(0, 1, 10), (0, 2, 6), (0, 3, 5), (1, 3, 15), (2, 3, 4)
+  ]
+
+kruskal(n, edges)
+
+pract 3 : 
+
+import math
+import cmath  # For handling complex numbers
+
+def find_roots(r, s):
+    """
+    Finds the roots of the characteristic equation: x^2 + r*x + s = 0.
+    Returns the roots as a tuple.
+    """
+    discriminant = r**2 - 4*s
+    if discriminant >= 0:
+        # Real roots
+        root1 = (-r + math.sqrt(discriminant)) / 2
+        root2 = (-r - math.sqrt(discriminant)) / 2
+        return (root1, root2)
+    else:
+        # Complex roots
+        real_part = -r / 2
+        imaginary_part = cmath.sqrt(-discriminant) / 2
+        root1 = complex(real_part, imaginary_part)
+        root2 = complex(real_part, -imaginary_part)
+        return (root1, root2)
+
+def solve_homogeneous(r, s, t1, t2):
+    """
+    Solves the homogeneous recurrence relation.
+    """
+    root1, root2 = find_roots(r, s)
+    if root1 == root2:
+        # Repeated root
+        return f"Homogeneous Solution: T(n) = (C1 + C2 * n) * ({root1:.2f}^n)"
+    else:
+        # Distinct roots
+        return f"Homogeneous Solution: T(n) = C1 * ({root1:.2f}^n) + C2 * ({root2:.2f}^n)"
+
+def solve_non_homogeneous(r, s, t):
+    """
+    Solves the non-homogeneous recurrence relation.
+    """
+    if t == 0:
+        return "Non-Homogeneous Solution: No non-homogeneous part."
+    
+    root1, root2 = find_roots(r, s)
+    if abs(root1 - 1) < 1e-6 or abs(root2 - 1) < 1e-6:
+        return "Non-Homogeneous Solution: Special case where 1 is a root."
+    else:
+        return f"Non-Homogeneous Solution: T(n) = A * {t}^n."
+
+def main():
+    print("Enter the coefficients r and s for the recurrence relation: ")
+    r = int(input("r: "))
+    s = int(input("s: "))
+    
+    print("Enter the first two terms of the sequence (T1 and T2): ")
+    t1 = int(input("T1: "))
+    t2 = int(input("T2: "))
+    
+    t = int(input("Enter the non-homogeneous term coefficient t: "))
+    
+    print(solve_homogeneous(r, s, t1, t2))
+    print(solve_non_homogeneous(r, s, t))
+
+if __name__ == "__main__":
+    main()
+
