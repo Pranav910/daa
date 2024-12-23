@@ -1,0 +1,181 @@
+pract 6 : 
+
+def floyd_warshall(graph):
+    # graph is a 2D list where graph[i][j] is the weight of the edge from i to j
+    V = len(graph)
+    
+    # Initialize the distance matrix with graph values
+    dist = [[float('inf')] * V for _ in range(V)]
+    
+    # Distance from a vertex to itself is zero
+    for i in range(V):
+        dist[i][i] = 0
+    
+    # Initialize distances with the direct edge weights
+    for u in range(V):
+        for v in range(V):
+            if graph[u][v] != 0:
+                dist[u][v] = graph[u][v]
+    
+    # Main Floyd-Warshall algorithm
+    for k in range(V):
+        for i in range(V):
+            for j in range(V):
+                if dist[i][k] != float('inf') and dist[k][j] != float('inf'):
+                    dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j])
+    
+    # Detect negative cycles
+    for i in range(V):
+        if dist[i][i] < 0:
+            print("Negative weight cycle detected!")
+            return None
+    
+    return dist
+
+pract 7 :
+
+import math
+
+def euclidean_distance(city1, city2):
+    """
+    Calculate the Euclidean distance between two cities.
+    """
+    return math.sqrt((city1[0] - city2[0])**2 + (city1[1] - city2[1])**2)
+
+def nearest_neighbor(cities):
+    """
+    Solve the TSP using the Nearest Neighbor heuristic.
+    cities is a list of tuples (x, y) representing city coordinates.
+    """
+    n = len(cities)
+    visited = [False] * n
+    tour = []
+    
+    # Start from the first city (arbitrary choice)
+    current_city = 0
+    tour.append(current_city)
+    visited[current_city] = True
+    total_distance = 0
+    
+    for _ in range(n - 1):
+        nearest_city = -1
+        min_distance = float('inf')
+        
+        # Find the nearest unvisited city
+        for i in range(n):
+            if not visited[i]:
+                dist = euclidean_distance(cities[current_city], cities[i])
+                if dist < min_distance:
+                    nearest_city = i
+                    min_distance = dist
+        
+        # Move to the nearest city
+        tour.append(nearest_city)
+        visited[nearest_city] = True
+        total_distance += min_distance
+        current_city = nearest_city
+    
+    # Return to the starting city
+    total_distance += euclidean_distance(cities[current_city], cities[tour[0]])
+    tour.append(tour[0])  # Add the starting city to complete the tour
+    
+    return tour, total_distance
+
+
+pract 8 : 
+
+def greedy_coloring(graph):
+    """
+    Perform greedy graph coloring.
+    graph is represented as an adjacency list, where graph[i] is a list of neighbors of vertex i.
+    """
+    n = len(graph)  # Number of vertices
+    colors = [-1] * n  # -1 means no color assigned
+    
+    # Assign the first color to the first vertex
+    colors[0] = 0
+    
+    # Assign colors to the rest of the vertices
+    for u in range(1, n):
+        # Create a boolean array to check which colors are used by adjacent vertices
+        available = [True] * n  # Initially, all colors are available
+        
+        # Check the colors of the neighbors of vertex u
+        for neighbor in graph[u]:
+            if colors[neighbor] != -1:
+                available[colors[neighbor]] = False
+        
+        # Find the first available color
+        for color in range(n):
+            if available[color]:
+                colors[u] = color
+                break
+    
+    return colors
+    
+    usage : 
+
+    graph = {0: [1, 2], 1: [0, 3], 2: [0, 3], 3: [1, 2]}
+    colors = greedy_coloring(graph)
+    print(colors)  # Output: [0, 1, 2, 1]
+
+pract 9 :
+
+def print_solution(board):
+    """ Function to print the board configuration """
+    for row in board:
+        print(" ".join("Q" if cell == 1 else "." for cell in row))
+    print("\n")
+
+def is_safe(board, row, col, n):
+    """ Function to check if placing a queen at board[row][col] is safe """
+    # Check column
+    for i in range(row):
+        if board[i][col] == 1:
+            return False
+    
+    # Check upper left diagonal
+    for i, j in zip(range(row-1, -1, -1), range(col-1, -1, -1)):
+        if board[i][j] == 1:
+            return False
+    
+    # Check upper right diagonal
+    for i, j in zip(range(row-1, -1, -1), range(col+1, n)):
+        if board[i][j] == 1:
+            return False
+    
+    return True
+
+def solve_queens(board, row, n):
+    """ Function to solve the 8 queens problem using backtracking """
+    # Base case: If all queens are placed, print the solution
+    if row >= n:
+        print_solution(board)
+        return True
+    
+    res = False
+    for col in range(n):
+        # Check if it's safe to place the queen at (row, col)
+        if is_safe(board, row, col, n):
+            # Place the queen
+            board[row][col] = 1
+            # Recur to place the next queen
+            res = solve_queens(board, row + 1, n) or res
+            # Backtrack: Remove the queen
+            board[row][col] = 0
+    
+    return res
+
+def eight_queens():
+    """ Function to initialize and start the backtracking solution for 8-Queens """
+    n = 8
+    # Create an empty chessboard (8x8)
+    board = [[0 for _ in range(n)] for _ in range(n)]
+    
+    # Start solving from the first row
+    if not solve_queens(board, 0, n):
+        print("Solution does not exist")
+
+# Run the 8-Queens problem
+eight_queens()
+
